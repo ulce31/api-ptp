@@ -1,0 +1,25 @@
+{
+  "name": "api-ptp",
+  "version": "1.0.0",
+  "description": "Personal Trainer Platform API (PTP) - It allows coachs to follow / guide their athletes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ulce31/api-ptp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ulce31/api-ptp/issues"
+  },
+  "homepage": "https://github.com/ulce31/api-ptp#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "express": "^4.18.1"
+  }
+}
