@@ -1,8 +1,11 @@
-const express = require("express");
-require("dotenv").config();
-const mongoose = require("mongoose");
+import express from "express";
+import dotenv from "dotenv";
+dotenv.config();
+import mongoose from "mongoose";
 const app = express();
 const port = 3000;
+
+import router from "./src/routes.js";
 
 async function connectToDB() {
   try {
@@ -15,9 +18,8 @@ async function connectToDB() {
   }
 }
 
-app.get("/", async (req, res) => {
-  res.send("TEST route");
-});
+app.use("/", router);
+
 app.listen(port, () => {
   console.log(`PTP API listens on ${port} port.`);
   connectToDB();
