@@ -23,6 +23,19 @@ const register = async (req, res) => {
   }
 };
 
-const login = (req, res) => {};
+const login = async (req, res) => {
+  try {
+    let { email, password } = req.body;
+    const userInDB = await userModel.findOne({
+      email,
+      password: crypto.createHash("sha256").update(password).digest("hex"),
+    });
+    if (userInDB) {
+      console.log("logged");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export default { register, login };
