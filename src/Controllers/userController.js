@@ -1,15 +1,15 @@
 import userModel from "../Models/userModel.js";
+import crypto from "crypto";
+
 const register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+    password = crypto.createHash("sha256").update(password).digest("hex");
     const newUser = new userModel({
       email,
       password,
     });
     await newUser.save();
-    const users = await userModel.find();
-    res.send({ users });
-    console.log(users);
   } catch (error) {
     let errorMessage;
     switch (error.code) {
@@ -17,9 +17,12 @@ const register = async (req, res) => {
         errorMessage = "Email already registered";
         break;
       default:
+        console.log(error);
     }
     res.send({ errorMessage });
   }
 };
 
-export default { register };
+const login = (req, res) => {};
+
+export default { register, login };
