@@ -5,6 +5,7 @@ dotenv.config();
 import cors from "cors";
 import supertokens from "supertokens-node";
 import Session from "supertokens-node/recipe/session/index.js";
+import UserRoles from "supertokens-node/recipe/userroles/index.js";
 
 import mongoose from "mongoose";
 const app = express();
@@ -29,7 +30,7 @@ supertokens.init({
     apiBasePath: "/",
     websiteBasePath: "/",
   },
-  recipeList: [Session.init()],
+  recipeList: [Session.init(), UserRoles.init()],
 });
 
 async function connectToDB() {
