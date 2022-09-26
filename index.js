@@ -4,18 +4,19 @@ import dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
 import supertokens from "supertokens-node";
+import mongoose from "mongoose";
 import Session from "supertokens-node/recipe/session/index.js";
 import UserRoles from "supertokens-node/recipe/userroles/index.js";
-
-import mongoose from "mongoose";
-const app = express();
-const port = 3000;
-
-import router from "./src/routes.js";
 import {
   errorHandler,
   middleware,
 } from "supertokens-node/lib/build/framework/express/framework.js";
+
+import Roles from "./src/Roles/index.js";
+import router from "./src/routes.js";
+
+const app = express();
+const port = 3000;
 
 supertokens.init({
   framework: "express",
@@ -30,8 +31,43 @@ supertokens.init({
     apiBasePath: "/",
     websiteBasePath: "/",
   },
-  recipeList: [Session.init(), UserRoles.init()],
+  recipeList: [
+    Session.init({
+      override: {
+        functions: (originalImplementation) => {
+          return {
+            ...originalImplementation,
+            createNewSession: async function (input) {
+              let { userId } = input;
+              let roles = await UserRoles.getRolesForUser(userId);
+              input.accessTokenPayload = {
+                ...input.accessTokenPayload,
+                roles,
+              };
+              return originalImplementation.createNewSession(input);
+            },
+          };
+        },
+      },
+    }),
+    UserRoles.init(),
+  ],
 });
+async function initRoles() {
+  const roles = ["ATHLETE", "COACH", "ADMIN"];
+  roles.forEach(async (role) => {
+    await Roles.createRole(role);
+  });
+}
+
+//Why those lines???
+/**
+ * TLDR : It wraps your API incomming request in an "req.body" object
+ *
+ *
+ */
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 async function connectToDB() {
   try {
@@ -43,15 +79,6 @@ async function connectToDB() {
     console.log(error);
   }
 }
-
-//Why those lines???
-/**
- * TLDR : It wraps your API incomming request in an "req.body" object
- *
- *
- */
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 
 app.use(
   cors({
@@ -69,4 +96,5 @@ app.use(errorHandler());
 app.listen(port, () => {
   console.log(`PTP API listens on ${port} port.`);
   connectToDB();
+  initRoles();
 });

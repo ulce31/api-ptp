@@ -1,16 +1,20 @@
 import userModel from "../Models/userModel.js";
 import crypto from "crypto";
 import Session from "supertokens-node/recipe/session/index.js";
+import UserRoles from "supertokens-node/recipe/userroles/index.js";
+import Roles from "../Roles/index.js";
 
 const register = async (req, res) => {
   try {
-    let { email, password } = req.body;
+    let { email, password, role } = req.body;
     password = crypto.createHash("sha256").update(password).digest("hex");
     const newUser = new userModel({
       email,
       password,
     });
-    await newUser.save();
+    let createdUser = await newUser.save();
+    await Roles.addRoleToUser(createdUser["_id"], role);
+    res.status(201).send("Successfully registed ✅");
   } catch (error) {
     let errorMessage;
     switch (error.code) {
@@ -47,4 +51,29 @@ const login = async (req, res) => {
   }
 };
 
-export default { register, login };
+const setUserRole = async (req, res) => {
+  try {
+    let { role, userId } = req.body;
+    //#1 Set role
+    await Roles.addRoleToUser(userId, role);
+    res.status(201).send(`UserId : ${userId}; Role ajouté: ${role}`);
+
+    //#2 Check role
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(`Server Error \nSever error : ${error}`);
+  }
+};
+
+const readRolesFromSession = async (req, res) => {
+  try {
+    let userId = req.session.getUserId();
+    let roles = await UserRoles.getRolesForUser(userId);
+    console.log(roles);
+    res.status(200).send({ roles });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export default { register, login, setUserRole, readRolesFromSession };
