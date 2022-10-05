@@ -2,6 +2,7 @@ import { Router } from "express";
 import { verifySession } from "supertokens-node/recipe/session/framework/express/index.js";
 import UserRoles from "supertokens-node/recipe/userroles/index.js";
 import userController from "./Controllers/userController.js";
+import Roles from "./Roles/index.js";
 
 const router = Router();
 
@@ -16,12 +17,8 @@ router.post("/set-role", userController.setUserRole);
 
 router.get(
   "/readFS",
-  verifySession({
-    overrideGlobalClaimValidators: async (globalValidators) => [
-      ...globalValidators,
-      UserRoles.UserRoleClaim.validator.includes("ATHLETE"),
-    ],
-  }),
+  verifySession(),
+  Roles.isWriteRole,
   userController.readRolesFromSession
 );
 

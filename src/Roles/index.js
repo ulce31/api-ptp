@@ -47,4 +47,23 @@ async function removeRoleFromUser(userId, role) {
   } catch (error) {}
 }
 
-export default { createRole, addRoleToUser, removeRoleFromUser };
+async function isWriteRole(req, res, next) {
+  const roles = await req.session.getClaimValue(UserRoles.UserRoleClaim);
+
+  if (roles === undefined || !roles.includes(allowedRoles)) {
+    // this error tells SuperTokens to return a 403 to the frontend.
+    throw new STError({
+      type: "INVALID_CLAIMS",
+      message: "User is not an admin",
+      payload: [
+        {
+          id: UserRoles.UserRoleClaim.key,
+        },
+      ],
+    });
+  } else {
+    next();
+  }
+}
+
+export default { createRole, addRoleToUser, removeRoleFromUser, isWriteRole };
