@@ -1,10 +1,15 @@
+import UserRoleClaim from "supertokens-node/recipe/userroles";
+import PermissionClaim from "supertokens-node/recipe/userroles";
+
+import { Request, Response } from "express";
+import { SessionRequest } from "supertokens-node/framework/express";
 import userModel from "../Models/userModel.js";
 import crypto from "crypto";
 import Session from "supertokens-node/recipe/session/index.js";
 import UserRoles from "supertokens-node/recipe/userroles/index.js";
 import Roles from "../Roles/index.js";
 
-const register = async (req, res) => {
+const register = async (req: Request, res: Response) => {
   try {
     let { email, password, role } = req.body;
     password = crypto.createHash("sha256").update(password).digest("hex");
@@ -13,22 +18,15 @@ const register = async (req, res) => {
       password,
     });
     let createdUser = await newUser.save();
-    await Roles.addRoleToUser(createdUser["_id"], role);
+    await Roles.addRoleToUser(createdUser["_id"]!.toString(), role);
     res.status(201).send("Successfully registed ✅");
   } catch (error) {
-    let errorMessage;
-    switch (error.code) {
-      case 11000:
-        errorMessage = "Email already registered";
-        break;
-      default:
-        console.log(error);
-    }
-    res.send({ errorMessage });
+    console.error(error);
+    res.send({ error });
   }
 };
 
-const login = async (req, res) => {
+const login = async (req: Request, res: Response) => {
   try {
     let { email, password } = req.body;
     const userInDB = await userModel
@@ -51,7 +49,7 @@ const login = async (req, res) => {
   }
 };
 
-const setUserRole = async (req, res) => {
+const setUserRole = async (req: Request, res: Response) => {
   try {
     let { role, userId } = req.body;
     //#1 Set role
@@ -65,9 +63,10 @@ const setUserRole = async (req, res) => {
   }
 };
 
-const readRolesFromSession = async (req, res) => {
+const readRolesFromSession = async (req: SessionRequest, res: Response) => {
   try {
-    let userId = req.session.getUserId();
+    let userId = req.session!.getUserId();
+
     let roles = await UserRoles.getRolesForUser(userId);
     console.log(roles);
     res.status(200).send({ roles });

@@ -1,7 +1,6 @@
-import pkg from "mongoose";
-const { Schema, model } = pkg;
+import  { Schema, model } from "mongoose";
 
-const userSchema = new Schema({
+const userSchema : Schema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
 });

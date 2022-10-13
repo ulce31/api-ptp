@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 dotenv.config();
+import {env} from "process"
 import cors from "cors";
 import supertokens from "supertokens-node";
 import mongoose from "mongoose";
@@ -18,11 +19,14 @@ import router from "./src/routes.js";
 const app = express();
 const port = 3000;
 
+
+
+
 supertokens.init({
   framework: "express",
   supertokens: {
     connectionURI: process.env.ST_URI,
-    apiKey: process.env.ST_API_KEY,
+    apiKey: env.ST_API_KEY,
   },
   appInfo: {
     appName: "ptp",
@@ -52,7 +56,7 @@ supertokens.init({
     }),
     UserRoles.init(),
   ],
-});
+}); 
 async function initRoles() {
   const roles = ["ATHLETE", "COACH", "ADMIN"];
   roles.forEach(async (role) => {

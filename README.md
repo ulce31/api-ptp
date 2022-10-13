@@ -14,7 +14,7 @@ Personal Trainer Platform API (PTP) - It allows coachs to follow / guide their a
    ```
 4. Start it 🎉
    ```bash
-   npm run start:dev
+   npm run tsc:w
    ```
 
 

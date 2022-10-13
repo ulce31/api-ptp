@@ -1,11 +1,17 @@
-import UserRoles from "supertokens-node/recipe/userroles/index.js";
+import { NextFunction } from "express";
+import UserRoles from "supertokens-node/recipe/userroles";
+import { Error as STError } from "supertokens-node/recipe/session";
 
-const roles = ["ATHLETE", "COACH", "ADMIN"];
+enum Roles {
+  Athlete,
+  Coach,
+  Admin,
+}
 //TODO have more refined permissions
 
-async function createRole(role) {
+async function createRole(role: string) {
   try {
-    if (roles.includes(role)) {
+    if (role in Roles) {
       const response = await UserRoles.createNewRoleOrAddPermissions(
         `${role}`,
         []
@@ -20,9 +26,12 @@ async function createRole(role) {
   }
 }
 
-async function addRoleToUser(userId, role) {
+async function addRoleToUser(
+  userId: string,
+  role: string
+): Promise<string | void> {
   try {
-    if (roles.includes(role)) {
+    if (role in Roles) {
       const response = await UserRoles.addRoleToUser(userId, `${role}`);
 
       if (response.status === "UNKNOWN_ROLE_ERROR") {
@@ -39,31 +48,12 @@ async function addRoleToUser(userId, role) {
     }
   } catch (error) {}
 }
-async function removeRoleFromUser(userId, role) {
+async function removeRoleFromUser(userId: string, role: string) {
   try {
-    if (roles.includes(role)) {
+    if (role in Roles) {
       const response = await UserRoles.removeUserRole(userId, `${role}`);
     }
   } catch (error) {}
 }
 
-async function isWriteRole(req, res, next) {
-  const roles = await req.session.getClaimValue(UserRoles.UserRoleClaim);
-
-  if (roles === undefined || !roles.includes(allowedRoles)) {
-    // this error tells SuperTokens to return a 403 to the frontend.
-    throw new STError({
-      type: "INVALID_CLAIMS",
-      message: "User is not an admin",
-      payload: [
-        {
-          id: UserRoles.UserRoleClaim.key,
-        },
-      ],
-    });
-  } else {
-    next();
-  }
-}
-
-export default { createRole, addRoleToUser, removeRoleFromUser, isWriteRole };
+export default { createRole, addRoleToUser, removeRoleFromUser };
