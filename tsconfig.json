@@ -1,5 +1,5 @@
 {
-  "include": ["./index.ts", "./env.d.ts", "src/**/*"],
+  "include": ["./index.ts", "./*.d.ts", "src/**/*"],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
 

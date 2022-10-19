@@ -1,32 +1,31 @@
 import express from "express";
 import bodyParser from "body-parser";
+import mongoose from "mongoose";
+
 import dotenv from "dotenv";
 dotenv.config();
-import {env} from "process"
+
 import cors from "cors";
-import supertokens from "supertokens-node";
-import mongoose from "mongoose";
-import Session from "supertokens-node/recipe/session/index.js";
-import UserRoles from "supertokens-node/recipe/userroles/index.js";
+
+import Supertokens from "supertokens-node";
+import UserRoles from "supertokens-node/recipe/userroles";
+import Session from "supertokens-node/recipe/session";
 import {
   errorHandler,
   middleware,
-} from "supertokens-node/lib/build/framework/express/framework.js";
+} from "supertokens-node/lib/build/framework/express/framework";
 
-import Roles from "./src/Roles/index.js";
-import router from "./src/routes.js";
+import Roles from "./src/Roles";
+import router from "./src/routes";
 
 const app = express();
 const port = 3000;
 
-
-
-
-supertokens.init({
+Supertokens.init({
   framework: "express",
   supertokens: {
     connectionURI: process.env.ST_URI,
-    apiKey: env.ST_API_KEY,
+    apiKey: process.env.ST_API_KEY,
   },
   appInfo: {
     appName: "ptp",
@@ -56,7 +55,7 @@ supertokens.init({
     }),
     UserRoles.init(),
   ],
-}); 
+});
 async function initRoles() {
   const roles = ["ATHLETE", "COACH", "ADMIN"];
   roles.forEach(async (role) => {
@@ -87,7 +86,7 @@ async function connectToDB() {
 app.use(
   cors({
     origin: "http://localhost:3001",
-    allowedHeaders: ["content-type", ...supertokens.getAllCORSHeaders()],
+    allowedHeaders: ["content-type", ...Supertokens.getAllCORSHeaders()],
     credentials: true,
   })
 );

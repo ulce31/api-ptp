@@ -1,12 +1,14 @@
 import UserRoleClaim from "supertokens-node/recipe/userroles";
 import PermissionClaim from "supertokens-node/recipe/userroles";
+import { Error as STError } from "supertokens-node/recipe/session";
+import { SessionRequest } from "supertokens-node/framework/express";
 
 import { Request, Response } from "express";
-import { SessionRequest } from "supertokens-node/framework/express";
+
 import userModel from "../Models/userModel.js";
 import crypto from "crypto";
 import Session from "supertokens-node/recipe/session/index.js";
-import UserRoles from "supertokens-node/recipe/userroles/index.js";
+import UserRoles from "supertokens-node/recipe/userroles";
 import Roles from "../Roles/index.js";
 
 const register = async (req: Request, res: Response) => {
@@ -66,9 +68,9 @@ const setUserRole = async (req: Request, res: Response) => {
 const readRolesFromSession = async (req: SessionRequest, res: Response) => {
   try {
     let userId = req.session!.getUserId();
-
     let roles = await UserRoles.getRolesForUser(userId);
     console.log(roles);
+    console.log(res);
     res.status(200).send({ roles });
   } catch (error) {
     console.log(error);

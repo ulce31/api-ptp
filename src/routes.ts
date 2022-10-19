@@ -1,7 +1,8 @@
 import { Router, Request, Response } from "express";
 import { verifySession } from "supertokens-node/recipe/session/framework/express/index";
-/* import UserRoles from "supertokens-node/recipe/userroles/index.js" */ import userController from "./Controllers/userController.js";
-/* import Roles from "./Roles/index.js";  */
+import UserRoles from "supertokens-node/recipe/userroles";
+import userController from "./Controllers/userController.js";
+import Roles, { eRoles } from "./Roles";
 
 const router = Router();
 
@@ -14,6 +15,11 @@ router.post("/login", userController.login);
 
 router.post("/set-role", userController.setUserRole);
 
-router.get("/readFS", verifySession({}), userController.readRolesFromSession);
+router.get(
+  "/readFS",
+  verifySession(),
+  Roles.isWriteRole([eRoles.Athlete]),
+  userController.readRolesFromSession
+);
 
 export default router;
