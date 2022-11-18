@@ -1,6 +1,5 @@
 import { Router, Request, Response } from "express";
 import { verifySession } from "supertokens-node/recipe/session/framework/express/index";
-import UserRoles from "supertokens-node/recipe/userroles";
 import userController from "./Controllers/userController.js";
 import Roles, { eRoles } from "./Roles";
 
@@ -18,7 +17,7 @@ router.post("/set-role", userController.setUserRole);
 router.get(
   "/readFS",
   verifySession(),
-  Roles.isWriteRole([eRoles.Athlete]),
+  Roles.isWriteRole([eRoles.Athlete, eRoles.Coach]),
   userController.readRolesFromSession
 );
 

@@ -9,11 +9,11 @@ import userModel from "../Models/userModel.js";
 import crypto from "crypto";
 import Session from "supertokens-node/recipe/session/index.js";
 import UserRoles from "supertokens-node/recipe/userroles";
-import Roles from "../Roles/index.js";
+import Roles, { eRoles } from "../Roles/index.js";
 
 const register = async (req: Request, res: Response) => {
   try {
-    let { email, password, role } = req.body;
+    let { email, password, role = eRoles.Athlete } = req.body;
     password = crypto.createHash("sha256").update(password).digest("hex");
     const newUser = new userModel({
       email,
@@ -45,20 +45,24 @@ const login = async (req: Request, res: Response) => {
        * - a new row has been inserted into the database for this new session
        */
       res.status(200).send("Successfully logged ✅");
+    } else {
+      res.status(404).send("User Not Find 🤷‍♂️");
     }
   } catch (error) {
     console.log(error);
+    res
+      .status(500)
+      .send(
+        "Houston... The server have a problem. Seriously contact the administrator"
+      );
   }
 };
 
 const setUserRole = async (req: Request, res: Response) => {
   try {
     let { role, userId } = req.body;
-    //#1 Set role
     await Roles.addRoleToUser(userId, role);
     res.status(201).send(`UserId : ${userId}; Role ajouté: ${role}`);
-
-    //#2 Check role
   } catch (error) {
     console.log(error);
     res.status(500).send(`Server Error \nSever error : ${error}`);
@@ -67,11 +71,11 @@ const setUserRole = async (req: Request, res: Response) => {
 
 const readRolesFromSession = async (req: SessionRequest, res: Response) => {
   try {
-    let userId = req.session!.getUserId();
-    let roles = await UserRoles.getRolesForUser(userId);
-    console.log(roles);
-    console.log(res);
-    res.status(200).send({ roles });
+    console.log("readRolesFromSession - HERE");
+    const userId = req.session!.getUserId();
+    const { roles } = await UserRoles.getRolesForUser(userId);
+    res.status(200).send(roles);
+    return;
   } catch (error) {
     console.log(error);
   }
